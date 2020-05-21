@@ -12,7 +12,6 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 
@@ -36,6 +35,7 @@ public class EKSPlugin implements Plugin {
     private String clusterName;
     private Map<String, Object> runtimeContext;
     private Set<AWSLogReference> logReferences;
+    private DockerUtils dockerUtils;
 
     public EKSPlugin() {
         this(ContainerInsightsUtil.getClusterName());
@@ -45,6 +45,7 @@ public class EKSPlugin implements Plugin {
         this.clusterName = clusterName;
         this.runtimeContext = new HashMap<>();
         this.logReferences = new HashSet<>();
+        this.dockerUtils = new DockerUtils();
     }
 
     @Override
@@ -99,7 +100,7 @@ public class EKSPlugin implements Plugin {
         runtimeContext.put(CLUSTER_NAME_KEY, clusterName);
 
         try {
-            runtimeContext.put(CONTAINER_ID_KEY, DockerUtils.getContainerId());
+            runtimeContext.put(CONTAINER_ID_KEY, dockerUtils.getContainerId());
         } catch (IOException e) {
             logger.error("Failed to read full container ID from kubernetes instance.", e);
         }
@@ -130,6 +131,6 @@ public class EKSPlugin implements Plugin {
      * Hash plugin object using origin to uniquely identify them
      */
     public int hashCode() {
-        return Objects.hash(this.getOrigin());
+        return this.getOrigin().hashCode();
     }
 }
